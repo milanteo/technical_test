@@ -9,9 +9,7 @@ services:
             dockerfile: ./Dockerfile
             args:
                 - BUILD=dev
-            environment:
-                DATABASE_URL: ${DATABASE_URL}
-                DB_VERSION:   ${DB_VERSION}
+        env_file: ../.env
         volumes:
             - ..:/workspace
 
@@ -21,5 +19,6 @@ services:
             dockerfile: ./Dockerfile
             args:
                 - BUILD=dev
+        env_file: ../.env
         volumes:
             - ..:/workspace

@@ -14,7 +14,9 @@
 	
 	"customizations": {
 		"vscode": {
-			"extensions": [ ]
+			"extensions": [
+				"bmewburn.vscode-intelephense-client"
+			]
 		}
 	}
 	

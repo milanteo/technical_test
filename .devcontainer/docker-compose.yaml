@@ -1,3 +1,6 @@
+include:
+  - ../docker-compose.yaml
+
 services:
 
     backend:
@@ -6,8 +9,9 @@ services:
             dockerfile: ./Dockerfile
             args:
                 - BUILD=dev
-        networks:
-            - local_network
+            environment:
+                DATABASE_URL: ${DATABASE_URL}
+                DB_VERSION:   ${DB_VERSION}
         volumes:
             - ..:/workspace
 
@@ -17,10 +21,5 @@ services:
             dockerfile: ./Dockerfile
             args:
                 - BUILD=dev
-        networks:
-            - local_network
         volumes:
             - ..:/workspace
-
-networks:
-    local_network:

@@ -1,0 +1,36 @@
+services:
+
+    reverse-proxy:
+      image: nginx:stable
+      ports:
+        - 80:80
+      volumes:
+        - ./nginx/logs:/var/log/nginx
+        - ./nginx/conf.d:/etc/nginx/conf.d
+
+    pgadmin:
+      image: dpage/pgadmin4:9
+      environment:
+        PGADMIN_DEFAULT_EMAIL:     ${PGADMIN_EMAIL}
+        PGADMIN_DEFAULT_PASSWORD:  ${PGADMIN_PASSWORD}
+      volumes:
+        - pgadmin_data:/var/lib/pgadmin
+          
+    database:
+      image: postgres:17.4
+      environment:
+        POSTGRES_DB:       ${DB_NAME}
+        POSTGRES_USER:     ${DB_USER}
+        POSTGRES_PASSWORD: ${DB_PASSWORD}
+      volumes:
+        - database_data:/var/lib/postgresql/data
+
+volumes:
+  database_data:
+  pgadmin_data:
+
+networks:
+  default:
+    name:   techtest_network
+    driver: bridge
+            

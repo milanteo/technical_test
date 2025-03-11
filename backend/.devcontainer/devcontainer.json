@@ -1,0 +1,19 @@
+{
+
+	"name": "Symfony Backend",
+
+	"dockerComposeFile": "../../docker-compose.yml",
+
+  	"service": "backend",
+
+	"workspaceFolder": "/opt/backend",
+
+	"overrideCommand": false,
+	
+	"customizations": {
+		"vscode": {
+			"extensions": [ ]
+		}
+	}
+	
+}

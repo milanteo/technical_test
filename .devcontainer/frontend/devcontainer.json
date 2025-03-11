@@ -2,13 +2,15 @@
 
 	"name": "Angular Frontend",
 
-	"dockerComposeFile": "../../docker-compose.yml",
+	"dockerComposeFile": "../docker-compose.yaml",
 
   	"service": "frontend",
 
-	"workspaceFolder": "/opt/frontend",
+	"workspaceFolder": "/workspace/frontend",
 
 	"overrideCommand": false,
+
+	"shutdownAction": "none",
 	
 	"customizations": {
 		"vscode": {

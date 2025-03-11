@@ -2,11 +2,13 @@
 
 	"name": "Symfony Backend",
 
-	"dockerComposeFile": "../../docker-compose.yml",
+	"dockerComposeFile": "../docker-compose.yaml",
 
   	"service": "backend",
 
-	"workspaceFolder": "/opt/backend",
+	"workspaceFolder": "/workspace/backend",
+
+	"shutdownAction": "none",
 
 	"overrideCommand": false,
 	

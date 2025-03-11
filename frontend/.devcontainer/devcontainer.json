@@ -1,0 +1,19 @@
+{
+
+	"name": "Angular Frontend",
+
+	"dockerComposeFile": "../../docker-compose.yml",
+
+  	"service": "frontend",
+
+	"workspaceFolder": "/opt/frontend",
+
+	"overrideCommand": false,
+	
+	"customizations": {
+		"vscode": {
+			"extensions": [ ]
+		}
+	}
+	
+}

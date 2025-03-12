@@ -10,15 +10,20 @@ RUN set -eux; \
         mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"; \
     else \
         mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"; \
+        pecl install xdebug && docker-php-ext-enable xdebug; \
+        echo "[xdebug]" >> "$PHP_INI_DIR/xdebug.ini"; \
+        echo "xdebug.mode=develop,debug" >> "$PHP_INI_DIR/xdebug.ini"; \
+        echo "xdebug.start_with_request=yes" >> "$PHP_INI_DIR/xdebug.ini"; \
+        echo "xdebug.discover_client_host=1" >> "$PHP_INI_DIR/xdebug.ini"; \
     fi
 
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
 RUN curl -sS https://get.symfony.com/cli/installer | bash && mv ~/.symfony5/bin/symfony /usr/local/bin/symfony
 
-RUN pecl install apcu   && docker-php-ext-enable apcu
+RUN pecl install apcu && docker-php-ext-enable apcu
 
-RUN pecl install xdebug && docker-php-ext-enable xdebug
+RUN pecl install ds && docker-php-ext-enable ds
 
 RUN apt update && apt install -y git zip unzip nginx libpq-dev
 

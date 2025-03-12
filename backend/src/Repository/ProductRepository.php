@@ -2,9 +2,12 @@
 
 namespace App\Repository;
 
+use App\Dto\CreateProductDto;
+use App\Entity\Order;
 use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Ds\Map;
 
 /**
  * @extends ServiceEntityRepository<Product>
@@ -14,6 +17,22 @@ class ProductRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Product::class);
+    }
+
+    public function create(Order $order, Map $dto): Product {
+
+        $product = new Product();
+
+        $product->setName($dto->get('name'));
+
+        $product->setPrice($dto->get('price'));
+
+        $product->setOrder($order);
+
+        $this->getEntityManager()->persist($product);
+
+        return $product;
+
     }
 
     //    /**

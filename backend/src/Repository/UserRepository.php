@@ -5,44 +5,28 @@ namespace App\Repository;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Ds\Map;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 /**
  * @extends ServiceEntityRepository<User>
  */
-class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
-{
+class UserRepository extends ServiceEntityRepository {
+
     public function __construct(ManagerRegistry $registry, private UserPasswordHasherInterface $hasher)
     {
         parent::__construct($registry, User::class);
     }
 
-    /**
-     * Used to upgrade (rehash) the user's password automatically over time.
-     */
-    public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $plainPassword): void
-    {
-        if (!$user instanceof User) {
-            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $user::class));
-        }
-
-        $user->setPassword($this->hasher->hashPassword($user, $plainPassword));
-        $this->getEntityManager()->persist($user);
-        $this->getEntityManager()->flush();
-    }
-
-    public function create(string $email, string $plainPassword): User {
+    public function create(Map $dto): User {
 
         $user = new User();
 
-        $user->setEmail($email);
-        $user->setPassword($this->hasher->hashPassword($user, $plainPassword));
+        $user->setEmail($dto->get('email'));
+
+        $user->setPassword($this->hasher->hashPassword($user, $dto->get('password')));
 
         $this->getEntityManager()->persist($user);
-        $this->getEntityManager()->flush();
 
         return $user;
 

@@ -7,6 +7,8 @@ use App\Dto\RegistrationDto;
 use App\Repository\UserRepository;
 use App\Security\JwtType;
 use App\Security\SecurityService;
+use App\Service\ApiService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -53,7 +55,9 @@ final class AuthController extends AbstractController {
     public function appRegistration(
         #[MapRequestPayload(validationFailedStatusCode: Response::HTTP_BAD_REQUEST)] 
         RegistrationDto $dto, 
-        UserRepository $users
+        UserRepository $users,
+        EntityManagerInterface $em,
+        ApiService $api
     ): JsonResponse {
 
         if($users->findOneBy([ 'email' => $dto->email ])) {
@@ -61,7 +65,9 @@ final class AuthController extends AbstractController {
             throw new HttpException(Response::HTTP_BAD_REQUEST, 'Invalid credentials!');
         }
 
-        $user = $users->create($dto->email, $dto->password);
+        $user = $users->create($api->extractData($dto));
+
+        $em->flush();
 
         return $this->json([
             'id'    => $user->getId(),

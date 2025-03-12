@@ -2,10 +2,13 @@
 
 namespace App\Controller;
 
+use App\Dto\CreateOrderDto;
+use App\Dto\PatchOrderDto;
 use App\Entity\Order;
 use App\Entity\Product;
 use App\Entity\User;
 use App\QueryDto\GetOrdersDto;
+use App\Repository\OrderRepository;
 use App\Security\Voter\OrderVoter;
 use App\Service\ApiService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,7 +16,9 @@ use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -50,11 +55,13 @@ final class DefaultController extends AbstractController {
         if(!!$dto->search) {
 
             $orders->andWhere($expr->orX(
-                $expr->like('o.code',        ':search'),
-                $expr->like('o.description', ':search')
+                $expr->like('LOWER(o.name)',        ':search'),
+                $expr->like('LOWER(o.description)', ':search')
             ));
 
-            $orders->setParameter('search', "%{$dto->search}%");
+            $search = strtolower($dto->search);
+
+            $orders->setParameter('search', "%{$search}%");
 
         }
 
@@ -63,7 +70,60 @@ final class DefaultController extends AbstractController {
             $orders->getQuery()->getResult()
         ));
 
-    }      
+    } 
+    
+    #[Route('/orders', name: 'app_post_order', methods: [ Request::METHOD_POST ])]
+    public function appPostOrder(
+        #[MapRequestPayload()]
+        CreateOrderDto $dto,
+        #[CurrentUser()]
+        User $user,
+        OrderRepository $orders,
+        EntityManagerInterface $em,
+        ApiService $api
+    ): JsonResponse {
+
+        $order = $orders->create($user, $api->extractData($dto));
+
+        $em->flush();
+
+        return $this->json($api->serializeOrder($order));
+        
+    } 
+
+    #[Route('/orders/{order}', name: 'app_patch_order', methods: [ Request::METHOD_PATCH ])]
+    #[IsGranted(OrderVoter::EDIT, subject: 'order')]
+    public function appPatchOrder(
+        #[MapEntity(mapping: [ 'order' => 'id' ])]
+        Order $order,
+        #[MapRequestPayload()]
+        PatchOrderDto $dto,
+        EntityManagerInterface $em,
+        ApiService $api
+    ): JsonResponse {
+
+        $order = $api->update($order, $api->extractData($dto));
+
+        $em->flush();
+
+        return $this->json($api->serializeOrder($order));
+        
+    } 
+
+    #[Route('/orders/{order}', name: 'app_delete_order', methods: [ Request::METHOD_DELETE ])]
+    #[IsGranted(OrderVoter::EDIT, subject: 'order')]
+    public function appDeleteOrder(
+        #[MapEntity(mapping: [ 'order' => 'id' ])]
+        Order $order,
+        EntityManagerInterface $em
+    ): Response {
+
+        $em->remove($order);
+        $em->flush();
+
+        return new Response(status: Response::HTTP_NO_CONTENT);
+        
+    } 
 
     #[Route('/orders/{order}/products', name: 'app_get_order_products', methods: [ Request::METHOD_GET ])]
     #[IsGranted(OrderVoter::VIEW, subject: 'order')]
@@ -77,6 +137,21 @@ final class DefaultController extends AbstractController {
             fn(Product $product) => $api->serializeProduct($product), 
             $order->getProducts()->toArray()
         ));
+        
+    } 
+
+    #[Route('/orders/{order}/products/{product}', name: 'app_delete_order_product', methods: [ Request::METHOD_DELETE ])]
+    #[IsGranted(OrderVoter::EDIT, subject: 'order')]
+    public function appDeleteOrderProducts(
+        #[MapEntity(mapping: [ 'order' => 'order', 'product' => 'id' ])]
+        Product $product,
+        EntityManagerInterface $em
+    ): Response {
+
+        $em->remove($product);
+        $em->flush();
+
+        return new Response(status: Response::HTTP_NO_CONTENT);
         
     } 
 }

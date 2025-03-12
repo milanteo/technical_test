@@ -27,7 +27,7 @@ class Order
     private ?\DateTimeInterface $date = null;
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: 'created_by', nullable: false)]
     private ?User $createdBy = null;
     
     #[ORM\OneToMany(targetEntity: Product::class, mappedBy: 'order', orphanRemoval: true)]

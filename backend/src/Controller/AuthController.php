@@ -13,8 +13,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -34,7 +33,7 @@ final class AuthController extends AbstractController {
 
         if(!$user || !$hasher->isPasswordValid($user, $dto->password)) {
 
-            throw new UnauthorizedHttpException('Invalid credentials!');
+            throw new HttpException(Response::HTTP_UNAUTHORIZED, 'Invalid credentials!');
         }
 
         $response = $this->json([
@@ -59,7 +58,7 @@ final class AuthController extends AbstractController {
 
         if($users->findOneBy([ 'email' => $dto->email ])) {
 
-            throw new BadRequestHttpException('Invalid credentials!');
+            throw new HttpException(Response::HTTP_BAD_REQUEST, 'Invalid credentials!');
         }
 
         $user = $users->create($dto->email, $dto->password);
@@ -71,16 +70,25 @@ final class AuthController extends AbstractController {
     }
 
     #[Route('/refresh-token', name: 'app_refresh_token', methods: [ Request::METHOD_POST ])]
-    public function appRefreshToken(Request $request, SecurityService $security): JsonResponse {
+    public function appRefreshToken(
+        Request $request, 
+        SecurityService $security,
+        UserRepository $users
+    ): JsonResponse {
 
         $refreshToken = $request->cookies->get('refreshToken');
 
         if(!$refreshToken) {
 
-            throw new UnauthorizedHttpException('Missing refreshToken!');
+            throw new HttpException(Response::HTTP_UNAUTHORIZED, 'Missing refreshToken!');
         }
 
-        [ $user ] = $security->decodeJsonWebToken(JwtType::REFRESH, $refreshToken);
+        $jwt = $security->decodeJsonWebToken(JwtType::REFRESH, $refreshToken);
+
+        if(!($user = $users->findOneBy([ 'email' => $jwt->identifier ]))) {
+
+            throw new HttpException(Response::HTTP_UNAUTHORIZED, 'Invalid refreshToken!');
+        }
 
         return $this->json([
             "accessToken"  => $security->encodeJsonWebToken(JwtType::ACCESS, $user)

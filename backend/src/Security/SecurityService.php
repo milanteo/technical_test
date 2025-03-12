@@ -4,7 +4,6 @@ namespace App\Security;
 
 use App\Entity\User;
 use DateTime;
-use Doctrine\ORM\EntityManagerInterface;
 use Firebase\JWT\JWT;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\Key;
@@ -21,8 +20,7 @@ class SecurityService {
 
     public function __construct(
         private ParameterBagInterface $params,
-        private RequestStack $stack,
-        private EntityManagerInterface $em
+        private RequestStack $stack
     ) { }
 
     public function getPrivateKey(): OpenSSLAsymmetricKey {
@@ -35,10 +33,7 @@ class SecurityService {
         return openssl_pkey_get_public(file_get_contents($this->params->get('publicKey')));
     }
 
-    /**
-     * @return array{ User, object }
-     */
-    public function decodeJsonWebToken(JwtType $type, string $bearer): array {
+    public function decodeJsonWebToken(JwtType $type, string $bearer): object {
 
         try {
 
@@ -50,15 +45,8 @@ class SecurityService {
     
                 throw new UnexpectedValueException();
             }
-    
-            /**
-             * @var User | null $user
-             */
-            $user = $this->em->getRepository(User::class)->findOneBy([ 'email' => $payload->identifier ]);
-    
-            $decoded = JWT::decode($bearer, new Key($this->getPublicKey(), self::JWT_ALGORITHM));
 
-            return [ $user, $decoded ];
+            return JWT::decode($bearer, new Key($this->getPublicKey(), self::JWT_ALGORITHM));
             
         } catch (ExpiredException $e) {
             

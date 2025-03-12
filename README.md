@@ -1,2 +1,2 @@
 # Generate Key-Pair
-openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048 && openssl rsa -in private_key.pem -pubout -out public_key.pem
+openssl genpkey -algorithm RSA -out ./backend/keys/private_key.pem -pkeyopt rsa_keygen_bits:2048 && openssl rsa -in ./backend/keys/private_key.pem -pubout -out ./backend/keys/public_key.pem

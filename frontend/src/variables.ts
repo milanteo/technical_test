@@ -1,0 +1,1 @@
+export const endpoint = 'http://techtest.local/api/v1';

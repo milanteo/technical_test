@@ -27,10 +27,16 @@ $angular-material-3-theme: mat.define-theme(
 }
 
 html, body { 
-    width: 100vw; 
-    height: 100vh; 
-    padding: 0; 
-    margin: 0; 
-    overflow: hidden;
-    font-family: Roboto, "Helvetica Neue", sans-serif;
+  width: 100vw; 
+  height: 100vh; 
+  padding: 0; 
+  margin: 0; 
+  overflow: hidden;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

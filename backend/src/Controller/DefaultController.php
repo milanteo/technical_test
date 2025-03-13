@@ -3,15 +3,19 @@
 namespace App\Controller;
 
 use App\Dto\CreateOrderDto;
+use App\Dto\CreateProductDto;
 use App\Dto\PatchOrderDto;
+use App\Dto\PatchProductDto;
 use App\Entity\Order;
 use App\Entity\Product;
 use App\Entity\User;
 use App\QueryDto\GetOrdersDto;
 use App\Repository\OrderRepository;
+use App\Repository\ProductRepository;
 use App\Security\Voter\OrderVoter;
 use App\Service\ApiService;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -42,6 +46,8 @@ final class DefaultController extends AbstractController {
             ->select('o')
             ->from(Order::class, 'o')
             ->orderBy("o.{$dto->orderBy}", $dto->orderDir)
+            ->setFirstResult(($dto->page - 1) * $dto->pageSize)
+            ->setMaxResults($dto->pageSize)
         ;
 
         if(!$this->isGranted('ROLE_ADMIN')) {
@@ -65,10 +71,18 @@ final class DefaultController extends AbstractController {
 
         }
 
-        return $this->json(array_map(
+        $paginator = new Paginator($orders);
+
+        $response = $this->json(array_map(
             fn(Order $order) => $api->serializeOrder($order), 
-            $orders->getQuery()->getResult()
+            $paginator->getQuery()->getResult()
         ));
+
+        $response->headers->add([
+            'X-Total' => $paginator->count()
+        ]);
+
+        return $response;
 
     } 
     
@@ -137,6 +151,44 @@ final class DefaultController extends AbstractController {
             fn(Product $product) => $api->serializeProduct($product), 
             $order->getProducts()->toArray()
         ));
+        
+    }
+    
+    #[Route('/orders/{order}/products', name: 'app_post_order_product', methods: [ Request::METHOD_POST ])]
+    #[IsGranted(OrderVoter::EDIT, subject: 'order')]
+    public function appPostOrderProducts(
+        #[MapEntity(mapping: [ 'order' => 'id' ])]
+        Order $order,
+        #[MapRequestPayload()]
+        CreateProductDto $dto,
+        ProductRepository $products,
+        ApiService $api,
+        EntityManagerInterface $em
+    ): JsonResponse {
+
+        $product = $products->create($order, $api->extractData($dto));
+
+        $em->flush();
+
+        return $this->json($api->serializeProduct($product));
+        
+    } 
+    
+    #[Route('/orders/{order}/products/{product}', name: 'app_patch_order_product', methods: [ Request::METHOD_PATCH ])]
+    #[IsGranted(OrderVoter::EDIT, subject: 'order')]
+    public function appPatchOrderProducts(
+        #[MapEntity(mapping: [ 'order' => 'order', 'product' => 'id' ])]
+        Product $product,
+        PatchProductDto $dto,
+        EntityManagerInterface $em,
+        ApiService $api
+    ): JsonResponse {
+
+        $product = $api->update($product, $api->extractData($dto));
+
+        $em->flush();
+
+        return $this->json($api->serializeProduct($product));
         
     } 
 

@@ -1,1 +1,20 @@
-<p>registration works!</p>
+<form [formGroup]="login" (ngSubmit)="onSubmit()" class="flex flex-col">
+
+    <mat-form-field>
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" type="text" [email]="true" />
+    </mat-form-field>
+
+    <mat-form-field>
+        <mat-label>Password</mat-label>
+        <input matInput formControlName="password" type="password" />
+    </mat-form-field>
+
+    <mat-form-field>
+        <mat-label>Repeat password</mat-label>
+        <input matInput formControlName="password_rep" type="password" />
+    </mat-form-field>
+
+    <button mat-flat-button type="submit" >Confirm</button>
+
+</form>

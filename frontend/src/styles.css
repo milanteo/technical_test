@@ -1,0 +1,26 @@
+/* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+
+html, body { 
+  width: 100vw; 
+  height: 100vh; 
+  padding: 0; 
+  margin: 0; 
+  overflow: hidden;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+body {
+  display: flex;
+}
+
+app-root {
+  flex: 1 1 auto;
+  margin: 10%;
+  display: flex;
+}
+
+router-outlet + * {
+
+  @apply flex-auto flex flex-col;
+}

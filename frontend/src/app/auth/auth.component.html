@@ -1,2 +1,30 @@
-<p>auth works!</p>
-<router-outlet></router-outlet>
+<div class="grid grid-cols-2 gap-4 flex-auto">
+
+    <div class="flex items-center justify-center">
+        
+        @if(routeTitle().includes('/login')) {
+
+            <router-outlet></router-outlet>
+
+        } @else {
+            
+            <button mat-flat-button [routerLink]="['login']" >Login</button>
+
+        }
+
+    </div>
+    <div class="flex items-center justify-center">
+
+        @if(routeTitle().includes('/registration')) {
+
+            <router-outlet></router-outlet>
+
+        } @else {
+            
+            <button mat-flat-button [routerLink]="['registration']" >Registration</button>
+
+        }
+
+    </div>
+
+</div>

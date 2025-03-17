@@ -10,8 +10,14 @@ export const routes: Routes = [
         path: '',
         loadComponent: () => import('./auth.component'),
         children: [
-            { path: 'login',        loadComponent: () => import('./login/login.component') },
-            { path: 'registration', loadComponent: () => import('./registration/registration.component') }
+            { 
+                path: 'login', 
+                loadComponent: () => import('./login/login.component') 
+            },
+            { 
+                path: 'registration',
+                loadComponent: () => import('./registration/registration.component') 
+            }
         ]
     }
 ];

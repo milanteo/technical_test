@@ -1,0 +1,80 @@
+
+<mat-expansion-panel (opened)="onOpen()" [(expanded)]="expanded" >
+    <mat-expansion-panel-header class="group">
+        <mat-panel-title> {{ order().name }} </mat-panel-title>
+        <mat-panel-description> {{ order().description }} </mat-panel-description>
+        <div class="flex items-center gap-2">
+            <button mat-mini-fab type="button" class="mr-2 invisible group-hover:visible" (click)="addProduct($event, order())">
+                <mat-icon>add</mat-icon>
+            </button>
+            <button mat-mini-fab type="button" class="mr-2 invisible group-hover:visible" (click)="editOrder($event, order())">
+                <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-mini-fab type="button" class="mr-4 invisible group-hover:visible" (click)="deleteOrder($event, order())">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </div>
+    </mat-expansion-panel-header>
+
+    <div class="flex flex-col gap-2">
+    
+        @for (item of products(); track item.id) {
+        
+            <div class="flex flex-auto flex-row items-center gap-2 product-item group" >
+
+                @if (item.editing) {
+
+                    <div class="flex-auto flex-col md:flex-row md:items-center flex gap-2">
+                        <mat-form-field class="flex-auto">
+                            <mat-label>Name</mat-label>
+                            <input matInput [formControl]="item.editing.controls.name" type="text" />
+                        </mat-form-field>
+                    
+                        <mat-form-field class="flex-auto">
+                            <mat-label>Price</mat-label>
+                            <input matInput [formControl]="item.editing.controls.price" type="number"  />
+                        </mat-form-field>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row gap-2 items-center">
+                        <button mat-mini-fab type="button" (click)="saveProduct(item.id, item.editing)">
+                            <mat-icon>save</mat-icon>
+                        </button>
+                        <button mat-mini-fab type="button" (click)="editProduct(item, false)">
+                            <mat-icon>close</mat-icon>
+                        </button>
+                    </div>
+
+                } @else {
+
+                    <div class="flex-auto flex-col md:flex-row flex md:items-center gap-2">
+                        <span>{{ item.name }}: </span>
+                        <span>{{ item.price }} €</span>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row gap-2 items-center">
+                        <button mat-mini-fab type="button" class="invisible group-hover:visible" (click)="editProduct(item, true)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-mini-fab type="button" class="invisible group-hover:visible" (click)="deleteProduct(item.id)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+
+                }
+
+            </div>
+        
+        } @empty {
+        
+            <mat-list-item role="listitem">No products in this order.</mat-list-item>
+        
+        }
+    
+    </div>
+
+</mat-expansion-panel>
+
+
+
+  

@@ -1,0 +1,6 @@
+@reference "tailwindcss";
+
+:host {
+    background-color: var(--mat-sys-surface-container);
+    @apply p-4 rounded-xl;
+}

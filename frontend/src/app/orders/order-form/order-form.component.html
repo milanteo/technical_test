@@ -1,0 +1,48 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col p-4 overflow-hidden">
+
+    <h2 class="text-xl/7 font-bold text-white sm:truncate sm:text-2xl sm:tracking-tight mb-4">
+
+        Create order
+    </h2>
+
+    <mat-form-field>
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name" type="text" />
+    </mat-form-field>
+
+    <mat-form-field>
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description" ></textarea>
+    </mat-form-field>
+
+    <button mat-stroked-button type="button" class="mb-4" (click)="addProduct()">Add Product</button>
+
+    <div class="h-52 overflow-auto mb-4"  >
+
+        @for (item of products.controls; track $index) {
+    
+            <div class="flex gap-2 items-center">
+    
+                <mat-form-field class="flex-auto">
+                    <mat-label>Name</mat-label>
+                    <input matInput [formControl]="item.controls.name" type="text" />
+                </mat-form-field>
+    
+                <mat-form-field>
+                    <mat-label>Price</mat-label>
+                    <input matInput [formControl]="item.controls.price" type="number" />
+                </mat-form-field>
+    
+                <button mat-fab type="button" class="mb-4" (click)="remove($index)">
+                    <mat-icon>delete</mat-icon>
+                </button>
+                
+            </div>
+    
+        }
+
+    </div>
+
+    <button mat-flat-button type="submit" [disabled]="!form.valid || !products.valid" >Confirm</button>
+
+</form>

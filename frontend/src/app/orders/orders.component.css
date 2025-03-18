@@ -1,0 +1,10 @@
+@reference "tailwindcss";
+
+:host {
+    overflow: auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--mat-sys-surface-container);
+    @apply  p-4 gap-2;
+}

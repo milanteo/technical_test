@@ -1,6 +1,6 @@
 @reference "tailwindcss";
 
-:host {
+.product-item {
     background-color: var(--mat-sys-surface-container);
-    @apply p-4 rounded-xl;
+    @apply rounded-xl p-2;
 }

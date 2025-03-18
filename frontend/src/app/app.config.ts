@@ -21,11 +21,20 @@ const appInitializer = () => {
 
 const JWTInterceptor = function(request: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
 
-  return next(request.clone({
+  const access_token = localStorage.getItem('access_token');
+
+  if(access_token) {
+
+    return next(request.clone({
       setHeaders: {
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`
       }
-  }));
+    }));
+
+  }
+
+  return next(request);
+
 };
 
 const refreshTokenInterceptor = function(request: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
@@ -35,11 +44,15 @@ const refreshTokenInterceptor = function(request: HttpRequest<unknown>, next: Ht
   return next(request).pipe(
     catchError((exception: HttpErrorResponse) => {
 
-      if(exception.error.name == "ExpiredAccessToken"){
+      if(exception.error.detail == "Expired access token."){
 
         return auth.refreshToken().pipe(
           tap(({ accessToken }) => localStorage.setItem('access_token', accessToken)),
-          switchMap(() => next(request))
+          switchMap(() => next(request.clone({
+            setHeaders: {
+              Authorization: `Bearer ${localStorage.getItem('access_token')}`
+            }
+          })))
         );
 
       }

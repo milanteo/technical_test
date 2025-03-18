@@ -1,15 +1,20 @@
 <form [formGroup]="login" (ngSubmit)="onSubmit()" class="flex flex-col">
 
+    <h2 class="text-xl/7 font-bold text-white sm:truncate sm:text-2xl sm:tracking-tight mb-4">
+
+        Login
+    </h2>
+
     <mat-form-field>
         <mat-label>Email</mat-label>
-        <input matInput formControlName="email" type="text" [email]="true" />
+        <input matInput formControlName="email" type="text" [email]="true"  />
     </mat-form-field>
 
     <mat-form-field>
         <mat-label>Password</mat-label>
-        <input matInput formControlName="password" type="password" />
+        <input matInput formControlName="password" type="password"  />
     </mat-form-field>
 
-    <button mat-flat-button type="submit" >Confirm</button>
+    <button mat-flat-button type="submit" [disabled]="!login.valid" >Confirm</button>
 
 </form>

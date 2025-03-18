@@ -18,7 +18,22 @@ const JWTguard: CanActivateFn = (
 };
 
 export const routes: Routes = [
-    { path: 'auth',   loadChildren:  () => import('./auth/auth.routes').then(h => h.routes) },
-    { path: 'orders', loadChildren:  () => import('./orders/orders.routes').then(h => h.routes), canActivate: [JWTguard] },
-    { path: '**',     loadComponent: () => import('./not-found/not-found.component') }
+    { 
+        path: 'auth',   
+        loadChildren:  () => import('./auth/auth.routes').then(h => h.routes) 
+    },
+    { 
+        path: 'orders', 
+        loadChildren:  () => import('./orders/orders.routes').then(h => h.routes), 
+        canActivate: [JWTguard] 
+    },
+    {
+        path: '',
+        redirectTo: 'orders',
+        pathMatch: 'full'
+    },
+    { 
+        path: '**',     
+        loadComponent: () => import('./not-found/not-found.component') 
+    }
 ];

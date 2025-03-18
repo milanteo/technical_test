@@ -1,5 +1,5 @@
 @reference "tailwindcss";
 
 :host {
-    
+    @apply items-center justify-center;
 }

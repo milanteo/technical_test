@@ -9,6 +9,9 @@ services:
         dockerfile: ./Dockerfile
         args:
           - BUILD=prod
+      depends_on:
+        database:
+          condition: service_healthy
 
     frontend:
       build:

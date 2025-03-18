@@ -1,0 +1,18 @@
+include:
+  - ./docker-compose.yaml
+
+services:
+
+    backend:
+      build:
+        context: ./backend
+        dockerfile: ./Dockerfile
+        args:
+          - BUILD=prod
+
+    frontend:
+      build:
+        context: ./frontend
+        dockerfile: ./Dockerfile
+        args:
+          - BUILD=prod

@@ -8,13 +8,16 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { OrderFormComponent } from './order-form/order-form.component';
-import { Subject, switchMap } from 'rxjs';
+import { debounceTime, Subject, switchMap } from 'rxjs';
 import { OrderComponent } from './order/order.component';
 import {BreakpointObserver} from '@angular/cdk/layout';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-orders',
-  imports: [MatSidenavModule, MatExpansionModule, MatButtonModule, MatIconModule, OrderComponent],
+  imports: [MatSidenavModule, MatExpansionModule, MatButtonModule, MatIconModule, OrderComponent, MatFormFieldModule, MatInputModule, FormsModule],
   templateUrl: './orders.component.html',
   styleUrl: './orders.component.css'
 })
@@ -36,6 +39,8 @@ export default class OrdersComponent implements OnInit {
 
   dialog = inject(MatDialog);
 
+  search = signal('');
+
   openDialog(): void {
 
     const dialogRef = this.dialog.open(OrderFormComponent);
@@ -47,8 +52,9 @@ export default class OrdersComponent implements OnInit {
   ngOnInit(): void {
     
     this.fetchOrders$.pipe(
+      debounceTime(500),
       takeUntilDestroyed(this.onDestroy),
-      switchMap(() => this.orders.fetchOrders())
+      switchMap(() => this.orders.fetchOrders(this.search()))
     ).subscribe(orders => this.ordersList.set(orders));
 
     this.orders.createdOrder$.pipe(takeUntilDestroyed(this.onDestroy)).subscribe(() => this.fetchOrders$.next());

@@ -19,6 +19,11 @@
     </div>
 </h2>
 
+<mat-form-field>
+    <mat-label>Search</mat-label>
+    <input matInput type="text" [(ngModel)]="search" (keyup)="fetchOrders$.next()" />
+</mat-form-field>
+
 @for (item of ordersList(); track item.id) {
 
     <app-order [order]="item" (deletedOrder)="deletedOrder($event)" (updated)="updatedOrder($event)" ></app-order>

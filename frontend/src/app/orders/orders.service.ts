@@ -37,9 +37,9 @@ export class OrdersService {
 
   updatedOrder$ = new Subject<ApiOrder>();
 
-  fetchOrders() {
+  fetchOrders(search: string) {
 
-    return this.http.get<ApiOrder[]>(`${endpoint}/orders`, {});
+    return this.http.get<ApiOrder[]>(`${endpoint}/orders`, { params: { search } });
 
   }
 

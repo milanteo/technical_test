@@ -10,7 +10,8 @@ use Firebase\JWT\Key;
 use OpenSSLAsymmetricKey;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 use UnexpectedValueException;
 
@@ -33,7 +34,7 @@ class SecurityService {
         return openssl_pkey_get_public(file_get_contents($this->params->get('publicKey')));
     }
 
-    public function decodeJsonWebToken(JwtType $type, string $bearer): object {
+    public function decodeJsonWebToken(JwtType $enumType, string $bearer): object {
 
         try {
 
@@ -41,7 +42,7 @@ class SecurityService {
     
             $payload = json_decode(base64_decode($payloadB64));
     
-            if($payload->type !== $type->value) {
+            if($payload->type !== $enumType->value) {
     
                 throw new UnexpectedValueException();
             }
@@ -50,11 +51,11 @@ class SecurityService {
             
         } catch (ExpiredException $e) {
             
-            throw new BadCredentialsException('The provided '. $type->value .' token is expired.');
+            throw new HttpException(Response::HTTP_UNAUTHORIZED, 'Expired '. $enumType->value .' token.');
 
-        } catch(Throwable $e) {
+        } catch (Throwable $e) {
 
-            throw new BadCredentialsException('The provided token is not valid.');
+            throw new UnexpectedValueException('Invalid '. $enumType->value .' token.');
 
         }
 

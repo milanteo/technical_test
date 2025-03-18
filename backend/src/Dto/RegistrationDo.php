@@ -13,7 +13,6 @@ class RegistrationDto {
     public string $email;
 
     #[NotBlank()]
-    #[PasswordStrength(minScore: PasswordStrength::STRENGTH_WEAK)]
     public string $password;
 
 }

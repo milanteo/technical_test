@@ -33,7 +33,7 @@ export class OrderFormComponent {
 
   onDestroy = inject(DestroyRef);
 
-  createdProduct = output<ApiOrder>();
+  createdOrder = output<ApiOrder>();
 
   form = this.fb.nonNullable.group({
     name: ['', Validators.required],
@@ -69,7 +69,7 @@ export class OrderFormComponent {
       takeUntilDestroyed(this.onDestroy)
     ).subscribe(order => {
       
-      this.createdProduct.emit(order);
+      this.createdOrder.emit(order);
 
       this.dialogRef.close();
     });

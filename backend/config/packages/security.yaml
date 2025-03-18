@@ -16,6 +16,12 @@ security:
 
             security: false
 
+        auth:
+            
+            pattern: ^/api/v1/auth
+
+            security: false
+
         main:
 
             lazy: true
@@ -36,9 +42,9 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
 
-        - { path: ^/api/v1/auth, role: PUBLIC_ACCESS }
+        - { path: ^/api/v1/auth, roles: PUBLIC_ACCESS }
 
-        - { path: ^/, role: IS_AUTHENTICATED_REMEMBERED }
+        - { path: ^/, roles: IS_AUTHENTICATED_REMEMBERED }
 
         # - { path: ^/profile, roles: ROLE_USER }
 

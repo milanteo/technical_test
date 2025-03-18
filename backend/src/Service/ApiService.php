@@ -39,17 +39,15 @@ class ApiService {
 
     public function extractData(mixed $dto): Map {
 
-        $resolver = TypeResolver::create();
-
         $reflection = new ReflectionClass($dto);
 
         $properties = array_filter($reflection->getProperties(), fn($p) => $p->isInitialized($dto));
 
         $data = new Map();
 
-        $parseValue = function(Type $docType, mixed $value) {
+        $parseValue = function(mixed $value) {
 
-            if($docType instanceof ObjectType) {
+            if(is_object($value)) {
 
                 return $this->extractData($value);
             }
@@ -60,15 +58,13 @@ class ApiService {
 
         foreach ($properties as $p) {
 
-            $docType = $resolver->resolve($p);
+            if(is_array($dto->{$p->getName()})) {
 
-            if($docType instanceof CollectionType) {
-
-                $data->put($p->getName(), array_map(fn($v) => $parseValue($docType->getCollectionValueType(), $v), $dto->{$p->getName()}));
+                $data->put($p->getName(), array_map(fn($v) => $parseValue($v), $dto->{$p->getName()}));
 
             } else {
 
-                $data->put($p->getName(), $parseValue($docType, $dto->{$p->getName()}));
+                $data->put($p->getName(), $parseValue($dto->{$p->getName()}));
 
             }
 

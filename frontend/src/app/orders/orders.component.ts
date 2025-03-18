@@ -6,13 +6,11 @@ import {MatExpansionModule} from '@angular/material/expansion';
 import { ApiOrder, OrdersService } from './orders.service';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
-import {
-  MatDialog
-} from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { OrderFormComponent } from './order-form/order-form.component';
-import { Subject, switchMap, takeUntil } from 'rxjs';
+import { Subject, switchMap } from 'rxjs';
 import { OrderComponent } from './order/order.component';
-import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
+import {BreakpointObserver} from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-orders',
@@ -42,20 +40,7 @@ export default class OrdersComponent implements OnInit {
 
     const dialogRef = this.dialog.open(OrderFormComponent);
 
-    this.breakpoint.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small,
-      Breakpoints.Medium,
-      Breakpoints.Large,
-      Breakpoints.XLarge,
-    ])
-    .pipe(
-      takeUntilDestroyed(this.onDestroy),
-      takeUntil(dialogRef.afterClosed()),
-    )
-    .subscribe(result => dialogRef.updateSize(
-      result.breakpoints[Breakpoints.XSmall] ? '90vw' : '60%'
-    ));
+    dialogRef.componentInstance.createdOrder.subscribe(() => this.fetchOrders$.next());
 
   }
 
